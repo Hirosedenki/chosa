@@ -1,0 +1,487 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>現場調査報告書</title>
+<meta name="theme-color" content="#1f6b5c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="調査報告書">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-192.png">
+<style>
+:root{
+  --bg:#eef2f1; --card:#ffffff; --ink:#1b2a27; --muted:#5b6b67; --line:#cdd8d5;
+  --accent:#1f6b5c; --accent-ink:#ffffff; --signal:#f2b705; --danger:#b3261e; --ok:#1f7a4d; --slot:#f5f8f7;
+  --f-body:"BIZ UDPGothic","Hiragino Sans","Yu Gothic",Meiryo,sans-serif;
+  --f-head:"Zen Kaku Gothic New","Hiragino Sans","Yu Gothic",sans-serif;
+  padding-top:env(safe-area-inset-top,0px);
+}
+@media (prefers-color-scheme: dark){:root{
+  --bg:#111917; --card:#1a2422; --ink:#e6eeec; --muted:#9aaba6; --line:#33433f;
+  --accent:#62c2ab; --accent-ink:#0b1715; --signal:#f2c230; --danger:#ef8a80; --ok:#5fc392; --slot:#212d2a; color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.6}
+img{max-width:100%}
+[hidden]{display:none!important}
+.wrap{max-width:600px;margin:0 auto;padding:20px 16px 130px;display:grid;gap:20px}
+header{display:grid;gap:4px}
+.eyebrow{font-size:12px;letter-spacing:.12em;color:var(--muted)}
+h1{font-family:var(--f-head);font-weight:900;font-size:24px;margin:0;line-height:1.3}
+h2{font-family:var(--f-head);font-weight:700;font-size:17px;margin:0}
+.saved{font-size:13px;color:var(--muted)}
+.saved.on::before{content:"● ";color:var(--ok)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px;display:grid;gap:14px}
+label.f{display:grid;gap:6px;font-size:14px;color:var(--muted)}
+input[type=text],input[type=date],textarea{font:inherit;font-size:16px;color:var(--ink);background:var(--slot);border:1px solid var(--line);border-radius:8px;padding:10px 12px;width:100%;min-width:0}
+textarea{resize:vertical;line-height:1.55}
+.sama{display:flex;align-items:center;gap:8px}.sama span{color:var(--ink);font-size:16px}
+input:focus-visible,textarea:focus-visible,button:focus-visible,.add:focus-within{outline:3px solid var(--signal);outline-offset:2px}
+.hint{font-size:13px;color:var(--muted);margin:0}
+.sheet-h{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.count{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.list{display:grid;gap:12px}
+.page-title{font-size:13px;font-weight:700;color:var(--muted);letter-spacing:.06em;border-top:1px dashed var(--line);padding-top:10px}
+.list .page-title:first-child{border-top:none;padding-top:0}
+.item{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:8px;align-items:stretch}
+.ph{position:relative;align-self:start;width:100%;aspect-ratio:4/3;background:#fff;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.ph img{width:100%;height:100%;object-fit:contain;display:block}
+.tag{position:absolute;top:6px;left:6px;background:var(--signal);color:#1b1500;font-size:12px;font-weight:700;padding:1px 7px;border-radius:4px;font-variant-numeric:tabular-nums}
+.tools{position:absolute;right:4px;bottom:4px;display:flex;gap:4px}
+.tools button{width:36px;height:36px;border-radius:6px;border:none;background:rgba(0,0,0,.62);color:#fff;font-size:16px;cursor:pointer;display:grid;place-items:center}
+.tools button.del{background:rgba(179,38,30,.88)}
+.tools button:disabled{opacity:.3}
+.desc{display:grid;grid-template-rows:1fr auto;gap:2px;min-width:0}
+.desc textarea{height:100%;min-height:120px;padding:8px;font-size:15px}
+.meter{font-size:12px;color:var(--muted);text-align:right;font-variant-numeric:tabular-nums}
+.meter.over{color:var(--danger);font-weight:700}
+.adds{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.add{position:relative;display:flex;align-items:center;justify-content:center;gap:6px;min-height:54px;border-radius:8px;border:1.5px solid var(--accent);color:var(--accent);font-weight:700;cursor:pointer;text-align:center;padding:4px}
+.add.main{background:var(--accent);color:var(--accent-ink)}
+.add input{position:absolute;width:1px;height:1px;opacity:0}
+#memo{min-height:180px}
+.bar{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px))}
+.bar-in{max-width:600px;margin:0 auto;display:grid;gap:6px}
+.go{font:inherit;font-weight:700;font-size:17px;min-height:54px;border:none;border-radius:10px;background:var(--accent);color:var(--accent-ink);cursor:pointer;width:100%}
+.go:disabled{opacity:.5;cursor:default}
+.status{font-size:13px;min-height:1.4em;margin:0;color:var(--muted)}
+.status.ok{color:var(--ok)}.status.err{color:var(--danger)}
+.reset{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.linkbtn{font:inherit;font-size:14px;background:none;border:none;color:var(--muted);text-decoration:underline;cursor:pointer;padding:4px 0}
+.linkbtn.danger{color:var(--danger);font-weight:700}
+.steps{margin:0;padding-left:1.3em;font-size:14px;color:var(--muted);display:grid;gap:2px}
+.empty{font-size:14px;color:var(--muted);text-align:center;padding:18px 8px;border:1.5px dashed var(--line);border-radius:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <span class="eyebrow">株式会社 廣瀬電気</span>
+    <h1>現場調査報告書</h1>
+    <span class="saved" id="saved">入力はこのスマホに自動で保存されます</span>
+    <div class="reset" id="resetRow"></div>
+  </header>
+
+  <section class="card" aria-labelledby="h-info">
+    <h2 id="h-info">表紙</h2>
+    <label class="f">お客様名
+      <span class="sama"><input type="text" id="customer" placeholder="例）〇〇株式会社" autocomplete="off"><span>様</span></span>
+    </label>
+    <label class="f">物件名<input type="text" id="building" placeholder="例）〇〇ビル" autocomplete="off"></label>
+    <label class="f">調査場所（住所）<input type="text" id="address" placeholder="例）東京都中央区〇〇1-2-3" autocomplete="off"></label>
+    <label class="f">調査日<input type="date" id="date"></label>
+    <label class="f">調査者<input type="text" id="surveyor" placeholder="例）神田 彩" autocomplete="off"></label>
+    <p class="hint">調査者の名前は次の調査でも残ります。</p>
+  </section>
+
+  <section class="card" aria-labelledby="h-photo">
+    <div class="sheet-h"><h2 id="h-photo">写真と説明</h2><span class="count" id="count">0枚</span></div>
+    <p class="hint">1ページに3枚、左に写真・右に説明が入ります。3枚を超えると「写真2」「写真3」…のページが増えます。説明は音声入力（キーボードのマイク）でも書けます。</p>
+    <div class="list" id="list"></div>
+    <div class="adds">
+      <label class="add main"><input type="file" id="cam" accept="image/*" capture="environment"><span>＋ 撮影する</span></label>
+      <label class="add"><input type="file" id="pick" accept="image/*" multiple><span>＋ 写真を選ぶ</span></label>
+    </div>
+  </section>
+
+  <section class="card" aria-labelledby="h-memo">
+    <h2 id="h-memo">現場メモ</h2>
+    <p class="hint">写真のページのあと、最後のページに罫線つきで入ります。長くなると自動で次のページに続きます。</p>
+    <textarea id="memo" placeholder="例）作業は平日9時〜17時のみ可能。&#10;駐車場あり（来客用1台）。&#10;天井高さ約2.7m、脚立で作業可。"></textarea>
+    <span class="meter" id="memoMeter"></span>
+  </section>
+
+  <section class="card" aria-labelledby="h-send">
+    <h2 id="h-send">LINE WORKSで送る</h2>
+    <ol class="steps">
+      <li>下の「Excelを作成」を押す</li>
+      <li>表示された画面で「LINE WORKS」を選ぶ（または保存してから、トークの添付で選ぶ）</li>
+      <li>送り先のトークを選んで送信</li>
+    </ol>
+  </section>
+</div>
+
+<div class="bar">
+  <div class="bar-in">
+    <button class="go" id="go" type="button">Excelを作成</button>
+    <p class="status" id="status" role="status" aria-live="polite"></p>
+  </div>
+</div>
+
+<script src="jszip.min.js"></script>
+<script>
+// 現場調査報告書 Excel生成ロジック（ブラウザ／Node共通）
+// シート構成：表紙 → 写真1, 写真2 …（1ページ3枚：左に写真・右に説明）→ 現場メモ
+
+const PER_PAGE = 3;
+const DESC_LINE_WIDTH = 16;   // 説明欄 1行の幅（全角1文字=1、半角=0.5）
+const DESC_MAX_LINES = 14;    // 説明欄に入る行数の目安
+const MEMO_LINE_WIDTH = 42;   // 現場メモ 1行の幅
+const MEMO_BASE_LINES = 32;   // 雛形の現場メモの行数（足りなければ行を足す）
+
+function textWidth(s) {
+  let w = 0;
+  for (const ch of String(s)) w += /[ -~｡-ﾟ]/.test(ch) ? 0.5 : 1;
+  return w;
+}
+// 文章を指定幅で折り返して行の配列にする（行頭に「、。」などが来ないようにする）
+function wrapLines(text, width) {
+  const NO_HEAD = /[、。，．,.）)」』】〕・ー～！？!?っゃゅょァィゥェォッャュョ]/;
+  const out = [];
+  for (const para of String(text || '').replace(/\r\n?/g, '\n').split('\n')) {
+    const chars = [...para];
+    if (!chars.length) { out.push(''); continue; }
+    let line = '', w = 0;
+    for (let i = 0; i < chars.length; i++) {
+      const ch = chars[i], cw = textWidth(ch);
+      if (w + cw > width && line && !NO_HEAD.test(ch)) { out.push(line); line = ''; w = 0; }
+      line += ch; w += cw;
+    }
+    out.push(line);
+  }
+  // 末尾の空行は落とす
+  while (out.length && out[out.length - 1] === '') out.pop();
+  return out;
+}
+function descLines(text) { return wrapLines(text, DESC_LINE_WIDTH).length; }
+
+const WEEK = ['日', '月', '火', '水', '木', '金', '土'];
+function dateText(iso) {
+  if (!iso) return '';
+  const [y, m, d] = iso.split('-').map(Number);
+  const wd = WEEK[new Date(y, m - 1, d).getDay()];
+  return y + '年' + m + '月' + d + '日（' + wd + '）';
+}
+
+// photos: [{data: Uint8Array(JPEG 4:3), desc: string}]
+// info: {customer, building, address, date(YYYY-MM-DD), surveyor}
+async function buildReport(JSZip, template, info, photos, memo) {
+  const zip = await JSZip.loadAsync(template);
+  const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  const inl = s => '<is><t xml:space="preserve">' + esc(s) + '</t></is>';
+
+  // 指定セルの値を差し替える（セルは雛形に既存・書式はそのまま）
+  function setCell(xml, ref, value) {
+    const re = new RegExp('<c r="' + ref + '"((?: [a-z]+="[^"]*")*?)(?:/>|>.*?</c>)');
+    const m = xml.match(re);
+    if (!m) throw new Error('cell not found ' + ref);
+    const attrs = m[1].replace(/ t="[^"]*"/, '');
+    const cell = (value === '' || value == null)
+      ? '<c r="' + ref + '"' + attrs + '/>'
+      : '<c r="' + ref + '"' + attrs + ' t="inlineStr">' + inl(value) + '</c>';
+    return xml.replace(re, () => cell);
+  }
+  const styleOf = (xml, ref) => { const m = xml.match(new RegExp('<c r="' + ref + '"[^>]*? s="(\\d+)"')); return m ? m[1] : '0'; };
+  const R_NS = 'http://schemas.openxmlformats.org/officeDocument/2006/relationships';
+
+  const customer = (info.customer || '').trim();
+  const building = (info.building || '').trim();
+  const day = dateText(info.date);
+
+  // ── 表紙（sheet1） ──
+  let cover = await zip.file('xl/worksheets/sheet1.xml').async('string');
+  cover = setCell(cover, 'C12', customer);
+  cover = setCell(cover, 'C14', building);
+  cover = setCell(cover, 'C16', (info.address || '').trim());
+  cover = setCell(cover, 'C18', day);
+  cover = setCell(cover, 'C20', (info.surveyor || '').trim());
+  zip.file('xl/worksheets/sheet1.xml', cover);
+
+  // ── 写真（sheet2 を雛形にページを増やす） ──
+  const base = await zip.file('xl/worksheets/sheet2.xml').async('string');
+  let wb = await zip.file('xl/workbook.xml').async('string');
+  let wbRels = await zip.file('xl/_rels/workbook.xml.rels').async('string');
+  let ct = await zip.file('[Content_Types].xml').async('string');
+  if (!/Extension="jpeg"/.test(ct)) ct = ct.replace('<Default ', '<Default Extension="jpeg" ContentType="image/jpeg"/><Default ');
+
+  const pages = Math.max(1, Math.ceil(photos.length / PER_PAGE));
+  const EMU = 9525, ROW_PX = 24; // 1行=18pt=24px
+  const head = building || customer;
+  let imgNo = 0, newSheets = '';
+
+  for (let p = 0; p < pages; p++) {
+    const sheetFile = p === 0 ? 'sheet2.xml' : 'sheet' + (10 + p) + '.xml';
+    let xml = base;
+    xml = setCell(xml, 'B2', '物件名：' + head);
+    xml = setCell(xml, 'D2', '調査日：' + day);
+    const pagePhotos = photos.slice(p * PER_PAGE, p * PER_PAGE + PER_PAGE);
+    for (let i = 0; i < PER_PAGE; i++) {
+      const s = 4 + i * 14;
+      xml = setCell(xml, 'B' + s, '写真 No.' + (p * PER_PAGE + i + 1));
+      const ph = pagePhotos[i];
+      if (ph && ph.desc && ph.desc.trim()) xml = setCell(xml, 'D' + (s + 1), ph.desc.replace(/\r\n?/g, '\n').replace(/\s+$/, ''));
+    }
+    if (p > 0) xml = xml.replace(/<sheetView /, '<sheetView ').replace(/ tabSelected="1"/, '');
+
+    if (pagePhotos.length) {
+      let anchors = '', rels = '';
+      pagePhotos.forEach((ph, i) => {
+        imgNo++;
+        const row0 = 4 + i * 14; // 0始まりの行番号 = 写真枠の最初の行（1始まり s+1）
+        const rid = 'rId' + (i + 1);
+        zip.file('xl/media/image' + imgNo + '.jpeg', ph.data);
+        rels += '<Relationship Id="' + rid + '" Type="' + R_NS + '/image" Target="../media/image' + imgNo + '.jpeg"/>';
+        const IN = 3 * EMU;
+        anchors += '<xdr:twoCellAnchor editAs="twoCell">' +
+          '<xdr:from><xdr:col>1</xdr:col><xdr:colOff>' + IN + '</xdr:colOff><xdr:row>' + row0 + '</xdr:row><xdr:rowOff>' + IN + '</xdr:rowOff></xdr:from>' +
+          '<xdr:to><xdr:col>2</xdr:col><xdr:colOff>0</xdr:colOff><xdr:row>' + (row0 + 11) + '</xdr:row><xdr:rowOff>' + ((ROW_PX - 3) * EMU) + '</xdr:rowOff></xdr:to>' +
+          '<xdr:pic><xdr:nvPicPr><xdr:cNvPr id="' + (i + 2) + '" name="写真' + (p * PER_PAGE + i + 1) + '"/><xdr:cNvPicPr><a:picLocks noChangeAspect="1"/></xdr:cNvPicPr></xdr:nvPicPr>' +
+          '<xdr:blipFill><a:blip r:embed="' + rid + '"/><a:stretch><a:fillRect/></a:stretch></xdr:blipFill>' +
+          '<xdr:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="' + (378 * EMU) + '" cy="' + (282 * EMU) + '"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></xdr:spPr></xdr:pic><xdr:clientData/></xdr:twoCellAnchor>';
+      });
+      const dn = p + 1;
+      zip.file('xl/drawings/drawing' + dn + '.xml', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<xdr:wsDr xmlns:xdr="http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="' + R_NS + '">' + anchors + '</xdr:wsDr>');
+      zip.file('xl/drawings/_rels/drawing' + dn + '.xml.rels', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' + rels + '</Relationships>');
+      zip.file('xl/worksheets/_rels/' + sheetFile + '.rels', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="' + R_NS + '/drawing" Target="../drawings/drawing' + dn + '.xml"/></Relationships>');
+      if (!/xmlns:r=/.test(xml.match(/<worksheet[^>]*>/)[0])) xml = xml.replace('<worksheet ', '<worksheet xmlns:r="' + R_NS + '" ');
+      xml = xml.replace('</worksheet>', '<drawing r:id="rId1"/></worksheet>');
+      ct = ct.replace('</Types>', '<Override PartName="/xl/drawings/drawing' + dn + '.xml" ContentType="application/vnd.openxmlformats-officedocument.drawing+xml"/></Types>');
+    }
+    zip.file('xl/worksheets/' + sheetFile, xml);
+    if (p > 0) {
+      const rid = 'rIdP' + (p + 1);
+      newSheets += '<sheet xmlns:r="' + R_NS + '" name="写真' + (p + 1) + '" sheetId="' + (100 + p) + '" r:id="' + rid + '"/>';
+      wbRels = wbRels.replace('</Relationships>', '<Relationship Id="' + rid + '" Type="' + R_NS + '/worksheet" Target="/xl/worksheets/' + sheetFile + '"/></Relationships>');
+      ct = ct.replace('</Types>', '<Override PartName="/xl/worksheets/' + sheetFile + '" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/></Types>');
+    }
+  }
+  // 増やした写真シートは「現場メモ」の前に並べる
+  if (newSheets) wb = wb.replace(/(<sheet [^>]*name="現場メモ")/, newSheets + '$1');
+
+  // ── 現場メモ（sheet3）：罫線1行に1行ずつ。足りなければ行を足す ──
+  let mx = await zip.file('xl/worksheets/sheet3.xml').async('string');
+  mx = setCell(mx, 'B2', '物件名：' + head + (day ? '　　調査日：' + day : ''));
+  const lines = wrapLines(memo, MEMO_LINE_WIDTH);
+  const total = Math.max(MEMO_BASE_LINES, lines.length);
+  const sFirst = styleOf(mx, 'B4'), sMid = styleOf(mx, 'B5'), sLast = styleOf(mx, 'B' + (3 + MEMO_BASE_LINES));
+  const rowHt = (mx.match(/<row r="4"[^>]*? ht="([\d.]+)"/) || [0, '22'])[1];
+  let rows = '';
+  for (let k = 0; k < total; k++) {
+    const r = 4 + k, st = k === 0 ? sFirst : (k === total - 1 ? sLast : sMid), v = lines[k];
+    rows += '<row r="' + r + '" ht="' + rowHt + '" customHeight="1"><c r="B' + r + '" s="' + st + '"' + (v ? ' t="inlineStr">' + inl(v) + '</c>' : '/>') + '</row>';
+  }
+  mx = mx.replace(/<row r="4"[\s\S]*<\/sheetData>/, rows + '</sheetData>');
+  mx = mx.replace(/<dimension ref="[^"]*"\/>/, '<dimension ref="B1:B' + (3 + total) + '"/>');
+  zip.file('xl/worksheets/sheet3.xml', mx);
+
+  zip.file('xl/workbook.xml', wb);
+  zip.file('xl/_rels/workbook.xml.rels', wbRels);
+  zip.file('[Content_Types].xml', ct);
+  return zip.generateAsync({ type: 'uint8array', compression: 'DEFLATE', mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+}
+if (typeof module !== 'undefined') module.exports = { buildReport, wrapLines, descLines, dateText, textWidth, PER_PAGE, DESC_LINE_WIDTH, DESC_MAX_LINES };
+
+const TEMPLATE_B64 = "UEsDBBQAAAAIAJN7a11Gx01IlwAAAM0AAAAQAAAAZG9jUHJvcHMvYXBwLnhtbE2PTQvCMBBE/0ro3aS16EFiQdSj6Ml7TDc2kGSXZIX476WCH7cZhvdg9CUjQWYPRdQYUtk2EzNtlCp2gmiKRIJUY3CYo+EiMd8VOuctHNA+IiRWy7ZdK6gMaYRxQV9hM+gdUfDWsMc0nLzNWNCxOFYLQewxkmF/CyCUOBMketYgetnJlVb/4Gy5Qi5z7mX3Hj9dq9+B4QVQSwMEFAAAAAgAk3trXTDKLtbvAAAAKwIAABEAAABkb2NQcm9wcy9jb3JlLnhtbM2S3UoDMRBGX6Xkfnc2u1g0bHOjeKUgWFC8C8m0Dd38kIxs+vaya7tF9AG8nfk43xmYXkehQ8KXFCImsphXxQ0+Cx037EAUBUDWB3Qq1yGiL27YheQU5TqkPUSlj2qP0DbNGhySMooUTMAqLkQme6OFTqgopDPe6AUfP9Mww4wGHNChpwy85sDk1BhPZejhCphghMnl7wGahThP/8TOG2DnZMl2SY3jWI/dnGubhsP789PrfG5lfSblNbJVyVbQKeKGXZrfuvuH7SOTbdOuK84rzrf8RrS3orv7mFx/+F2FXTB2Z/+x8UVQ9vDrL+QXUEsDBBQAAAAIAJN7a12ZXJwjDwYAAJwnAAATAAAAeGwvdGhlbWUvdGhlbWUxLnhtbO1aXXObOBR9z6/QaGf2bWsw4NhpSCf+anebtJnE250+XmMZ1AiJEXIS//sdge0gwNjtOpt0N34IQdI5956rK12EffruIWbojsiUCu5j+42F350dncKJikhM0EPMeHoCPo6USk5arTSISAzpG5EQ/hCzuZAxqPSNkGFrJuGe8jBmrbZldVoxUI4Rh5j4+PN8TgOCJpoSnx0htOYfMRITrlLdlrUGTN4EmeUiEuf92YjZrb2+y+7TZTpgEt0B8/E95TNxPyEPCiMGqRow6WMr++DWhqNlkJzCCVO7KAt04+xj0hUIMg/bJp0Mpxs+e+z2jodlb9qGNw3w0Wg0GNll60U4BAHhZUFFCnfctfslD0qgDU2DJwPLs9xamqo3znaaXr/f93p1NE6Fxt1O07U67nm7jsat0HgNsemfDwadOhqvQtPZTjM+7nXcWppOgSZilN9uJ9FZW040A3IKJ3PBPjSzdC3L6pay30Tpls2y2yzEueBqx0qM4ZuQY8GVYZ2BohypZULmEBAfDyCeSgqPHmSjCBSGlPqCdHufdgulgaSJ8vEfCXBcGPvrLw/jcXv4Nrs6zluU/2PpBsfqu6vrcX4dOPn1fPy2ycgH4GHJSL83tDV2cOxamZHzwSgz0vdsbxdZWiLz+t2+xrpjz9mFVSVsx+tndo+HuchOxxrpa+986DZynUuYFrkmNCYp+kTu0bWIgTe6QabyB6GTCKgBhUjE5cwwECMVGYhPS2CNgD4xZ+uLpHzWiHi/+GbouYnkQtEmxMcoNhCXQrC+kM3aP2o3itoXPNzhl1wUAdcAd41uDUq5NVokEYkrK8/ERMSQcsWAKwgJJwrpPnFLSBP+K6XG/FzSQIpUzBX6SlEfaHMgJ3Sq6tEfaAwMlo2+TyIwInr5BfUFazQ4JHcmBHgIrNEIYcYsvIeFgrhZFcSsCLkAFTUKuVnKwJi4VEngIWECjWYkTRvBn+XSkPQRGN2RWZdsGZsQqehtI+QChChChuJ2EEGcNOuiPCqCfk9vhWCAroRq9k+Ya1jfC0aB786oL5SoH9yc/qRhVJ+MumchzRJaqX26HlK+Vz1kdCrLKl7r4Yuqh+eSNu8L5Sq4E/AfrX1DWPArwqPX0vda+l5L30sqfTt3pO8seGZxy4+R6yPi46kx3nVonFPGbtSSkYvUrJOpYHQ2pow9tubtGd/mPJtEAyYNWa1a7CmchBKyRiSF+ouq6CaChPjYxiULYWr4smlFiUh9bGGza7tT5XH5ay7KVT7IM19DmXygLsUsH+dY9QMzoWu7JXdb2t+tEhxt+lAynOPnkmHnjAfSYXt76tgyb9+lI28ppZl+OKQcAQ99bHfauTqUBsDITKdpKcnX6fzycjyNYEZWSW7vF1XbOXR2dP95chR09Jzn0nGILC8KcfcVUr8enjrNrV1pnlWamqKhaXltJWEc3fu457U9jAJIfDxnoDAK4mTm41QXWGAh93GgZHmZ1Bah/YNfCv2WiJYCb9UN2xr2LeUuo01kqoaQRjlxNqocXcZrQtX2XD0lTxur1lOrcLr2z6oiv6vJcDKfk0DVZnmhq2Q676nb78VCEXkTze7RlC3kNcx87ObLcUZT5eP2+kb62HNXK9WsLPU7U/l7i5oNLP/mhCURrOpqd/t+k9NVV8TG//Is1Eh+bC7F6Kli5/yLsWvYq19j97yxW+0dhBNnVglEADGRgPTm4GMhVSRCCUlEg7EUXNVJlEIhBkoHADH9Db2ODLkrFc61Pzl/xSyjYaSuaYgkDX2sIknIlVrF+/us2u3ax/psA1sZqeyQ1VjoCCU14ZmSO8ImejPv6GnCKFoXp+q+a+C3JGyp2dxbp+H4f3sWdfc9ix7i8GNIcA95hnObznCFB7Hec6k98MN8e89pa3tP+DCfgIqQ/uPjgMqAEVyRr5/XJ+KaBAptXnwg5ePfuqutfdM49bHdrarStrWJn+UE/JiSNWJqp+hlvh4p5NqWg2011w4h5AlyzatJtZr1vV+m6ba6epEdTuPCW1DdUPllm34Cmn4jgRqSOSyYSlurVvKgJAzWv725SFXr7GjDcHb0N1BLAwQUAAAACACTe2tdQafHdOYDAAAnDwAAGAAAAHhsL3dvcmtzaGVldHMvc2hlZXQxLnhtbJVXW2/jKBT+K4hKfWttwGAntS2labu70qw2mnYvr25CEjS28QKZdOfXr8BO6nTshL4khvMdON/hXCDdS/VNbzk34K0qa53BrTHNNAj0csurQt/KhtdvVbmWqiqMvpVqE+hG8WLllKoywGHIgqoQNcxTN7dQeSp3phQ1Xyigd1VVqP/ueSn3GUTwMPFVbLbGTgR52hQb/szNn81CgbUwL3JRbHgnC45rrkTFay1kDRRfZ/A+nj4QaiEO8Zfge937Bnor978osfoiaq4zGELwXfB9BmvLpITAEn+V8psF/7aygDzVvORLY7colkZ853NelhmcWav/dZvOejZZxf73Yfcn56qFAq+F5nNZ/i1WZpvBBIIVXxe70nyV+195R98RWMpSu1+wb7ERBMudNrLqdBEElajb/+Kt80wPj8YUcKeAPyhQPKJAOgXyQYGN4KMOH33AjxlEO7zjHbTEndceClPkqZJ7oBzaeSc5rHL0F8zTQMn9EYm9kcQbGXkjqTeSeSPjFknZEHJpEfcxBNo5yWRQ1DbRno2CeSp0npr8+gpP2CS6u75CGCfJ3fUVxjQJe2NCKZr05YydjjGN4/4Y0Tg5wRMW3qWBydPA7hksO8vmrWXYWWYLwlHyMCQ54Z14e2jijUShP9Q/5lAXdASPH5HFaBd0I2eEMGHY+pJE1Pk0Dies9TWyvmeUhGzQx93S0YCTOxEdjwy3y+mqp9z80wRFHm6ILrgBT3BiQw+HGEV+9KNx+lGP/mCQIf+MRcyDHrtA75Bphww7ZCKmiOLzNNk4TXaRZuxPM/GgmXyWJgsTep5eMk4vuUjPvwLg8DI9i/kUPYLjmJyl1y05RK8TnaGHP9H+/Psf9s9s7N8BsX9CYf8eiP3jF/v3DewfNsS/cRD/0yKfuK10p4XPXAMsRrurxVhxZYy5nhIRQtsiS231ISgkJ/08whNk/5MYWTxJGHXjmMVoML67reOB+B4UnXLrwstmwii3tpQnZ7hFibMxRJHjFCPXOHAYIuIqbUJcpUU2R+18QqycEELiO3LDbiYHBzzOnl/A4nE2fwT46UxvJGdjvbObnrX75fELCMkNoZTchDRC72fAKJ7Q45k8zf7p48iQVUHv3lxxtXGvFQ2WclcbW3p6s92LiZCpPZ7gZ0k8fYiH5gk9PLJ+kkTTB+Ju/cH75nnaKFGbPxr7htJgK5X4IWtTlHNeG674qvfg+71QG1FrUPK1yWB4G0GgWm+6byOb7utVGiMrO7D+58WKKzvAEKylNIfB+zNy1wCpBK9NYa3IYCOVUYUwEDRFw9Wz+MHdHdK9NN9PsB0fnyuW2PFtnP8PUEsDBBQAAAAIAJN7a12qHtH22AQAAMQXAAAYAAAAeGwvd29ya3NoZWV0cy9zaGVldDIueG1slVhtb6M4EP4rliv106lgGxNIAGnTam9Pupdqey+faXAStIA54zS9/fUnG5LGXeO4Xwr2MzPPjNN5nEx25OLbsGdMgte26YYc7qXsl0EwbPasLYc73rPutW22XLSlHO642AVDL1hZaae2CXAYxkFb1h0sMr33KIqMH2RTd+xRgOHQtqX4b80afswhgqeNr/VuL9VGUGR9uWNPTP7VPwqwreWf/LHcsQkLzjGrumXdUPMOCLbN4RotH6JImWiLv2t2HC7ewbDnx59FXf1ad2zIYQjBS82OOexUJQ0EqvBnzr8p418qZVBkA2vYRiqKciPrF3bPmiaHn1TW/2rSTxc5KcfL9xP7Z31UjwI8lwO7580/dSX3OUwgqNi2PDTyKz9+YVP5VMXb8GbQf8FxtEV3FILNYZC8nbwRBG3djc/ydTqbCw8azTjgyQG/c5inIJMHeedBkhmHaHKIvCno5KGrD8by9dk9lLIsMsGPQGhrdUY4PkU5nxosso2yWKtPJocpBDKHdaf+5Z6kgEVWD0Umi9sbnMZptLq9wZgm4er2hlCKUrWO4/GJ6WKhnoguEr1PYmWHME70OkwSZUfCKKWrLJBFFqjYwabIAsGP51zxlGs4nyvWuaLQkSzWZDjEKBqTQiq5mJIwfkeuQz5MIdFsyB/qjcOEzoQ06iFjPdajNwyj0RAl84VHY5Z4vnDjlMHv/A7Zqr0ah1AaGp9ejLCzSno9eTqSEk2qNO4tnwmKDMiIH1+PH49BqCW+FTLiL67HX8zHt0JG/OR6/GQ+vhUy4qfX46fz8a2QEV812zUCZTPHYMdMCuRBgRwUVsykwB4U2EFhxUwK4kFBHBRWzKTwUAoUOSismEnh0c+IOiismEnh0dLI0dN2zKSYutrKYFp69CdKPq6+2Ka+1wN9WH6RR/+jdF6AT5hDgbGHAmCHAtgxk8JDAbBDAeyYSeGhANihAHbMpPBQAOxQADtmUngoAHYogB0zKTwUADsUwI6ZFB4KgB0KYMdMCo97HTsudjtmUnhIB3bc7XbMpPDobuy43u2Y+S3Vo7uJo7vtmEmBfNWYeDQpwR9XY2JT4+uBPqzGxEMBCJlX4xPmUGPioQDEoQB2zKTwUADiUAA7ZlJ4KABxKIAdMyk8FIA4FMCOmRQeCkAcCmDHTAoPBSAOBbBj5s9PDwWIHApgx0wKj/s9ctzvdsyk8JCOyHG/2zGTwqO7I8f9bsdMCp9ZgKO77ZhJQa+qcXAxSGqZ2Okh3gA2/NDpgcbF7jRIpEv1lT34AXigywcrsCZkuR5nj+9dULpUt4oFIeQ0r3wfDaXL9egTvCVcZL2oO/lHr8aRA9hzUX/nnSybe9ZJJlh1MTv9rRS7uhtAw7Yyh+FdBIEYj0W/S95Pb89cSt6qhTpHVlZMqAWGYMu5PC3eJrKHHnBRs06WKosc9lxIUdYSgr7smXiqvzP9I14Pbd8+inF9nvkFRTZyfdYkRcar6oveKLLg4p1X1WRxW7b96l7/hXpYhaehFUErMG4k+mqL4um5QOMzIdM+Wf10e4MXKFYATggKV1AHTIEeh8Wx2o8IoePEjerxIApJohhwhNPRcYGUIUliqteLeIFWOutTMeyFdedqLhfq/WQUXC62tRjk2cVY6cXZyVyZZxicB/fF/1BLAwQUAAAACACTe2tdY1QSbXcDAABdDgAAGAAAAHhsL3dvcmtzaGVldHMvc2hlZXQzLnhtbI2X247bNhCGX4WgAV8VK3FonaIDkN0iTYEGNbJNe821aJuIJKokvdrk6QNSsutt4pA3Foee+f8Z4TMwriapPusj5wa99N2ga3w0ZnwTRXp35D3Td3Lkw0vf7aXqmdF3Uh0iPSrOWlfUdxHEcRr1TAy4qdzdVjWVPJlODHyrkD71PVNf7nknpxoTfL74KA5HYy+iphrZgT9y82ncKrQX5i+5ZQe+fBddNFvR80ELOSDF9zW+J2/uaWJTXMbfgk/66oz0UU6/KdH+IQauaxxj9Cz4VOPBTtJhZAd/kvKzTf69tQlNpXnHd8ZasJ0Rz/yBd12N39qu/3Wmb696soXX57P7O/eqtgo9Mc0fZPePaM2xxjlGLd+zU2c+yuk9X8Z3A+xkp90nmuZccpdgtDtpI/ulmmDUi2F+spfl3VxVFHCjAJYC+F/BbQu6VFA36tybG+xXZlhTKTkh5bLtAJCeVS4j4aba2Yx7+9pqXGBkaiwGy8OjUbiphG4q06xXUKTFplyvAJI8LtcrAgmhy3NTVpFpqsjmRrumipScLt6weMe3vcF5k/gn5pAX1jwG4pogCcnK9SpNaJz+zJzO5j+c+1XiZukSbne5mbtMXZf2B/SdW+IXSWaR7LZI6hdJvSKZXyTziuR+kdwrUvhFCq+IRcOnYnN8MiRAhvhlIEAG/DI0QIb6ZQLQJRu/TAC8xE8vCcCX+PklAQATP8EkAGHiZ5gEQEz8FEMAxeCnGAIoBj/FEEAx+CmGAIrBTzEEUAx+iiGAYvBTDAEUg59iCKAY/BRDAMXgpxgCKAY/xTSAYuqnmAZQTP0U0wCKqZ9iGkAx9VNMAyimfoppAMV0oTj/gUx0tQGOSgzmz9HuyRodpRJf5WBY98AHwxVvr5b6D0wdxKBRx/emxvHdBiM1u7qzkeNyepLGyN4Gtk/OWq5sABjtpTTn4L+/CqcRSSX4YJjtosajVEYxYTAa2cjVo/jK3Z7g/k2cJ42X+LLvRk01e71zJk0l2/a9u2iq6Oos23bJWLN+LB/cJ3a7IiTzzkhJieaL3G2wm3R5ZmR+5nS5p+Uv6xVkJLVfQE5JXGInWKD1CtI0Te39htJk3k4TuxpTEtPcOsAGirkwIzaR5mni4izNSOm6Pg/Dn/lwmeY6sOdzUnQd7IXS5lLyKnLBpeh19PodRpd/lM03UEsDBBQAAAAIAJN7a13b28kh9wMAAD8ZAAANAAAAeGwvc3R5bGVzLnhtbN1Z4W7bNhB+FYEPUFlSolmDJGAz4G1AOwRofuyvbFEWMYpUKTqz+zN9j73B0AEbsGFI+jJ5AL9CcaIsq47OsVM7TWchEMnjfffd8Y6UlLDSS05f55Rqa1FwUUUk17r81raraU6LpHohSyoWBc+kKhJdvZBqZleloklagVLBbXcw8O0iYYLEoZgX40JX1lTOhY7IgNhxmEmxGQmIGYhDkRTUukp4REYJZxPF6rlJwfjSDLswMJVcKkvntKARcWCkemvEjukBywanYEIqGLSNhW07P/5wsbr9b/Xh99Xtzer2/er231cwe9LgdcFd/zg4jnc4Tqt7diQO55/Bwdmhu7r5Y3Xzl7W6+fPu+u+763/u3r27u37/KBo41CmYdKHqWxWHGeO8zVKPmIE4LBOtqRJjxnmtUw/eE1lN+3JZ0ojMVLJ03MbdfRQqyVkKJmejOt3VbBKRwWDswlXDdFRb0PpWxeFEqpSqlrtP1kNxyGmm7ThUbJbDXcsSQiK1loUdhylLZlIktWNrjc0dJln17hCRVM4nnJJ1OTb8zI8YdZj+II7O613iYBTwY08MmNp4vKdGPbcOzp4KWpbHcuyzjOYJU9saw/o6ZE0ORWkaVRxOKeevAeSXrM0+h8ThIrPMOfBTCkeABRW2bjLOm6aBMR0w1EUz2F3Y4FG4VsmupP5+rrUUdf/NXGp6oWjGFnV/kbUEMHQHQXeIlZQlX37H2UwU1Di/t8E4TNZ6Vi4VeyuFhr1pSoWmilhXVGk27YxAiBbZ4UE4gNOOILh4iE8QhLoiuzEwSfhgDDyEpXsSlrDT9JC0qlwx8eulHDNjh4m0MflV8H+I5NmTkrxfD3vSxOrBPUo9nD9pPTx6U/BPTvNgSt88PaXtivzyFHdudnsGcrhh6XZZes8rBbE6fGY0sTU/Dc3trVfLkli/qaS8pIu9UnRHVI+wu2HBOHt+28b586N0vIMQpWQ3j8edZ/BPnsDbUQvekSPyM3y84Rsj1mTOuGai6eUsTam49yBexaFOJpx+ij8gVkqzZM71ZSuMyKb9iqZsXgTtrAtwvJm1ab+EXc/x2088VRzCc9KCpqOmq2aTUf+70LZkXP/6JZiOkfVLQIbZwRhgOkYLs/N/8meI+mNkGLdhr2SI6gxRnUH71rotGdUXZqdfJwiCoN/TIPA838ciOhr1MhhhcfN9+OtHw7iBBmYHLB0Wa3y18QzZnQfYmu7KEMxTPBMxT/FYg6Q/bqARBP2rjdkBDWwVsNwB+/12IKf6dTwPVhXjhlUwLgkCTAK52J+jvo9Ex4erf32wKvG8IOiXgKyfgedhEqhGXIIxAA6YxDMf7bfOI3t9Ttmbf5nEHwFQSwMEFAAAAAgAk3trXZeKuxzAAAAAEwIAAAsAAABfcmVscy8ucmVsc53SS2oDMQyA4asM3neUptBFyGTVTXal5AKqrXkwtiVklbq3D8kmmdAX2YufT0LbN4poE+cyTlKammIunRvNZANQ/EgJS8tCuabYsya00rIOIOhnHAjWq9Uz6HXD7bbXzebwJfSfIvf95OmF/UeibN+EbyZcc0AdyDpXI3yyzu/Mc1tTdM0+dE734dHBnZaft4NEhgENwbPSgygLqU1ULpzA/lVZynliAVrfDfr7OFSNcqDwOwlFFqKnkwgWP7A7AlBLAwQUAAAACACTe2tdetUup3oBAABCAwAADwAAAHhsL3dvcmtib29rLnhtbLWSz0rkQBDGXyX0A9iZ0RV2SHJRdIVlV1bxXulUTGF3V+iucVyvwl73LAj+OfkAnvdlRGYfQ5IQNrAgXjxVV1VT/L6vKltxOCuZz5ILZ33MVSPSLrSOpkEHcYNb9BfO1hwcSNzgcKpjGxCq2CCKs3qeptvaAXlVZOOsw6CnCQsaIfa6yLrCCeEq/ut3aXJOkUqyJD9z1b8tqsSRJ0eXWOUqVUlsePWFA12yF7BHJrC1uZoNjRMMQua/8lEHeQxl7CsC5Q8Q4lxtp6lKagpR+h/9fDBC53gM5ZAthffICoZdENwPvGzJn3ZjdJHpiYzehzEOJi7Ce2zkuiaDu2yWDr0MPga0HaCPDbVRJR4c5urv/eP66boThCgH1SBOQHBiVVhQlatwUPV8H8fy8ut6fXM7m8DM34CZfyzM+vefl7un56v756uHCdHmG0Sb/frGnVVYk8fqGziMusgMWHMYki70Ns+3Ps0+q6ReWrsD1nz3Xxmq8QTG8y1eAVBLAwQUAAAACACTe2tdu2zq7LoAAAAaAwAAGgAAAHhsL19yZWxzL3dvcmtib29rLnhtbC5yZWxzxZM9DoJAEEavQvYADIJaGKCysTVeYLMOLGH/sjNGvL1RC9jEwsZQTb4p3veKmfqMRvLgHekhUDZZ46gRmjkcAEhptJJyH9BN1nQ+WsmU+9hDkGqUPUJZFHuIS4Zo6yUzuzwC/kL0XTcoPHp1s+j4CxjuPo6kEVlkFxl75EbAZOY1wXts8skakZ2ujYin60bA2kJlIlSuL1QlQtUfhYgfBmm2+eSkfvvHetZocW5/x88yPZLdywGSV2ifUEsDBBQAAAAIAJN7a12m/EpbIwEAAN8EAAATAAAAW0NvbnRlbnRfVHlwZXNdLnhtbM2UTU7DMBCFrxJ5W8UuRWKBmm6ALXTBBYw9aazYHsszLentUdIfCVQiqiDBxl545n1v/GQvX/cJqOiCj1SJhjndK0WmgaBJYoLYBV9jDppJYt6opE2rN6AW8/mdMhgZIpfca4jV8hFqvfVcPHUMkRzGSmTwJIqHQ2HPqoROyTuj2WFUu2i/UMojQWbwQw01LtGsC16oi4T+5HvAse9lBzk7C8VaZ37WASqhOq+I9x5Ijktc8Ih17QxYNNsAkSWlDNpSA8DBy4PobJzMDQQ4rDeT+YPMGNCiWWdMpAxmuB53iqTvLlPGBJnd+Ihnok5p8nzQp23B/pDdefWOuR3yIDVs0+/4c8Zn/St9LP6Jj9s/9PGG2P72k+t3GbSLJ74a/rXVB1BLAQIUAxQAAAAIAJN7a11Gx01IlwAAAM0AAAAQAAAAAAAAAAAAAACAAQAAAABkb2NQcm9wcy9hcHAueG1sUEsBAhQDFAAAAAgAk3trXTDKLtbvAAAAKwIAABEAAAAAAAAAAAAAAIABxQAAAGRvY1Byb3BzL2NvcmUueG1sUEsBAhQDFAAAAAgAk3trXZlcnCMPBgAAnCcAABMAAAAAAAAAAAAAAIAB4wEAAHhsL3RoZW1lL3RoZW1lMS54bWxQSwECFAMUAAAACACTe2tdQafHdOYDAAAnDwAAGAAAAAAAAAAAAAAAgIEjCAAAeGwvd29ya3NoZWV0cy9zaGVldDEueG1sUEsBAhQDFAAAAAgAk3trXaoe0fbYBAAAxBcAABgAAAAAAAAAAAAAAICBPwwAAHhsL3dvcmtzaGVldHMvc2hlZXQyLnhtbFBLAQIUAxQAAAAIAJN7a11jVBJtdwMAAF0OAAAYAAAAAAAAAAAAAACAgU0RAAB4bC93b3Jrc2hlZXRzL3NoZWV0My54bWxQSwECFAMUAAAACACTe2td29vJIfcDAAA/GQAADQAAAAAAAAAAAAAAgAH6FAAAeGwvc3R5bGVzLnhtbFBLAQIUAxQAAAAIAJN7a12XirscwAAAABMCAAALAAAAAAAAAAAAAACAARwZAABfcmVscy8ucmVsc1BLAQIUAxQAAAAIAJN7a1161S6negEAAEIDAAAPAAAAAAAAAAAAAACAAQUaAAB4bC93b3JrYm9vay54bWxQSwECFAMUAAAACACTe2tdu2zq7LoAAAAaAwAAGgAAAAAAAAAAAAAAgAGsGwAAeGwvX3JlbHMvd29ya2Jvb2sueG1sLnJlbHNQSwECFAMUAAAACACTe2tdpvxKWyMBAADfBAAAEwAAAAAAAAAAAAAAgAGeHAAAW0NvbnRlbnRfVHlwZXNdLnhtbFBLBQYAAAAACwALAMoCAADyHQAAAAA=";
+</script>
+<script>
+const $ = id => document.getElementById(id);
+const FIELDS = ['customer','building','address','date','surveyor'];
+const photos = []; // {id, data:Uint8Array, url, desc}
+function setStatus(msg,cls){ const s=$('status'); s.textContent=msg; s.className='status'+(cls?' '+cls:''); }
+function today(){ const t=new Date(); return t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0'); }
+function btn(txt,label,fn,disabled,cls){ const b=document.createElement('button'); b.type='button'; b.textContent=txt; b.setAttribute('aria-label',label); b.disabled=!!disabled; if(cls) b.className=cls; b.onclick=fn; return b; }
+
+// ── 端末内の保存（IndexedDB。写真も含めて、アプリを閉じても消えない） ──
+const DB = (()=>{
+  let p;
+  const open = () => p || (p = new Promise((res,rej)=>{ const r=indexedDB.open('hirose-chosa',1); r.onupgradeneeded=()=>r.result.createObjectStore('kv'); r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error); }));
+  const run = (mode, fn) => open().then(db => new Promise((res,rej)=>{ const tx=db.transaction('kv',mode); const st=tx.objectStore('kv'); const q=fn(st); tx.oncomplete=()=>res(q&&q.result); tx.onerror=()=>rej(tx.error); tx.onabort=()=>rej(tx.error); }));
+  return {
+    get: k => run('readonly', st => st.get(k)),
+    set: (k,v) => run('readwrite', st => st.put(v,k)),
+    del: k => run('readwrite', st => st.delete(k)),
+  };
+})();
+let saveTimer = null, saveOK = true;
+function stateObj(){ return { info:Object.fromEntries(FIELDS.map(k=>[k,$(k).value])), memo:$('memo').value, order:photos.map(p=>p.id), desc:Object.fromEntries(photos.map(p=>[p.id,p.desc||''])) }; }
+function saveState(now){
+  clearTimeout(saveTimer);
+  const doSave = () => DB.set('state', stateObj()).then(()=>{ saveOK=true; markSaved(); }).catch(()=>{ saveOK=false; markSaved(); });
+  if (now) return doSave();
+  saveTimer = setTimeout(doSave, 400);
+}
+function markSaved(){
+  const s=$('saved');
+  if(!saveOK){ s.className='saved'; s.textContent='※このスマホに保存できませんでした。作成が終わるまでアプリを閉じないでください。'; return; }
+  const t=new Date(); s.className='saved on'; s.textContent='自動保存済み（'+t.getHours()+':'+String(t.getMinutes()).padStart(2,'0')+'）';
+}
+try{ navigator.storage && navigator.storage.persist && navigator.storage.persist(); }catch(e){}
+
+// ── 写真の読み込み（4:3 の白い台に縦横比そのままで収める） ──
+async function loadImage(file){
+  if (window.createImageBitmap){ try { return await createImageBitmap(file, {imageOrientation:'from-image'}); } catch(e){} }
+  return await new Promise((res,rej)=>{ const img=new Image(); img.onload=()=>res(img); img.onerror=rej; img.src=URL.createObjectURL(file); });
+}
+async function processFile(file){
+  const img = await loadImage(file);
+  const iw = img.width || img.naturalWidth, ih = img.height || img.naturalHeight;
+  const W = 1600, H = 1200, PAD = 0.01;
+  const k = Math.min(W*(1-2*PAD)/iw, H*(1-2*PAD)/ih);
+  const dw = Math.round(iw*k), dh = Math.round(ih*k);
+  const c = document.createElement('canvas'); c.width=W; c.height=H;
+  const ctx = c.getContext('2d'); ctx.fillStyle='#fff'; ctx.fillRect(0,0,W,H);
+  ctx.drawImage(img, Math.round((W-dw)/2), Math.round((H-dh)/2), dw, dh);
+  if (img.close) img.close();
+  const blob = await new Promise(r=>c.toBlob(r,'image/jpeg',0.82));
+  return new Uint8Array(await blob.arrayBuffer());
+}
+function makePhoto(id, data, desc){ return {id, data, desc:desc||'', url:URL.createObjectURL(new Blob([data],{type:'image/jpeg'}))}; }
+async function addFiles(files){
+  if(!files.length) return;
+  let n=0, failed=0;
+  setStatus('写真を読み込み中… (0/'+files.length+')');
+  for(const f of files){
+    try{
+      const data = await processFile(f);
+      const id = Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+      try{ await DB.set('img:'+id, data); }catch(e){ saveOK=false; }
+      photos.push(makePhoto(id, data, ''));
+      render();
+    }catch(err){ failed++; }
+    n++; setStatus('写真を読み込み中… ('+n+'/'+files.length+')');
+  }
+  await saveState(true);
+  setStatus(failed ? failed+'枚の写真を読み込めませんでした。別の写真を選んでください。' : files.length+'枚追加しました。下の欄に説明を書いてください。', failed?'err':'ok');
+}
+['cam','pick'].forEach(id=>$(id).addEventListener('change', e=>{ const files=[...e.target.files]; e.target.value=''; addFiles(files); }));
+
+// ── 表示 ──
+function meterText(el, text){
+  const n = descLines(text);
+  el.textContent = n ? '約'+n+'／'+DESC_MAX_LINES+'行' : '';
+  el.classList.toggle('over', n > DESC_MAX_LINES);
+  if (n > DESC_MAX_LINES) el.textContent += '（枠からはみ出します。短くするか、現場メモへ）';
+}
+function render(){
+  const box=$('list'); box.innerHTML='';
+  if(!photos.length){ const e=document.createElement('div'); e.className='empty'; e.textContent='まだ写真がありません。「撮影する」か「写真を選ぶ」で追加してください。'; box.appendChild(e); }
+  photos.forEach((ph, idx)=>{
+    if (idx % PER_PAGE === 0){ const t=document.createElement('div'); t.className='page-title'; t.textContent=(idx/PER_PAGE+1)+'ページ目（シート「写真'+(idx/PER_PAGE+1)+'」）'; box.appendChild(t); }
+    const item=document.createElement('div'); item.className='item';
+    const f=document.createElement('div'); f.className='ph';
+    const im=document.createElement('img'); im.src=ph.url; im.alt='写真 No.'+(idx+1); f.appendChild(im);
+    const tag=document.createElement('span'); tag.className='tag'; tag.textContent='No.'+(idx+1); f.appendChild(tag);
+    const tools=document.createElement('div'); tools.className='tools';
+    tools.append(btn('↑','写真'+(idx+1)+'を前へ',()=>move(idx,-1),idx===0), btn('↓','写真'+(idx+1)+'を後へ',()=>move(idx,1),idx===photos.length-1), btn('×','写真'+(idx+1)+'を削除',()=>delPhoto(idx),false,'del'));
+    f.appendChild(tools);
+    const d=document.createElement('div'); d.className='desc';
+    const ta=document.createElement('textarea'); ta.id='desc-'+idx; ta.value=ph.desc||''; ta.placeholder='説明（例：分電盤 1階東側。主幹 3P 225A）'; ta.setAttribute('aria-label','写真 No.'+(idx+1)+'の説明');
+    const mt=document.createElement('span'); mt.className='meter'; meterText(mt, ph.desc);
+    ta.addEventListener('input',()=>{ ph.desc=ta.value; meterText(mt, ta.value); saveState(); });
+    d.append(ta, mt);
+    item.append(f, d); box.appendChild(item);
+  });
+  $('count').textContent = photos.length+'枚'+(photos.length? '（'+Math.ceil(photos.length/PER_PAGE)+'ページ）':'');
+}
+function move(i,dir){ const j=i+dir; if(j<0||j>=photos.length) return; [photos[i],photos[j]]=[photos[j],photos[i]]; render(); saveState(); }
+let pendingDel = null;
+function delPhoto(i){
+  // 押し間違い防止：同じ写真の×を2回押すと削除
+  const ph = photos[i];
+  if (pendingDel !== ph.id){ pendingDel = ph.id; setStatus('写真 No.'+(i+1)+'を削除するには、もう一度 × を押してください。','err'); setTimeout(()=>{ if(pendingDel===ph.id) pendingDel=null; }, 4000); return; }
+  pendingDel = null;
+  URL.revokeObjectURL(ph.url); photos.splice(i,1); DB.del('img:'+ph.id).catch(()=>{});
+  render(); saveState(); setStatus('写真を1枚削除しました。');
+}
+function memoMeter(){
+  const n = wrapLines($('memo').value, 42).length;
+  $('memoMeter').textContent = n ? '約'+n+'行（'+Math.max(1,Math.ceil(n/32))+'ページ）' : '';
+}
+$('memo').addEventListener('input',()=>{ memoMeter(); saveState(); });
+FIELDS.forEach(k=>$(k).addEventListener('input',()=>{ if(k==='surveyor'){ try{ localStorage.setItem('hirose-chosa-surveyor',$(k).value); }catch(e){} } saveState(); }));
+
+// ── 新しい調査を始める（2段階確認。調査者名は残す） ──
+function resetRow(confirming){
+  const row=$('resetRow'); row.innerHTML='';
+  if(!confirming){ const b=btn('新しい調査を始める（入力と写真を消す）','新しい調査を始める',()=>resetRow(true)); b.className='linkbtn'; row.appendChild(b); return; }
+  const yes=btn('本当に消す','本当に消す', async ()=>{
+    photos.forEach(p=>{ URL.revokeObjectURL(p.url); DB.del('img:'+p.id).catch(()=>{}); });
+    photos.length=0;
+    ['customer','building','address'].forEach(k=>$(k).value=''); $('date').value=today(); $('memo').value='';
+    render(); memoMeter(); await saveState(true); setStatus('消去しました。新しい調査を入力できます。','ok'); resetRow(false); window.scrollTo(0,0);
+  });
+  yes.className='linkbtn danger';
+  const no=btn('やめる','やめる',()=>resetRow(false)); no.className='linkbtn';
+  row.append(yes,no);
+}
+
+// ── 起動時に前回の続きを読み込む ──
+(async ()=>{
+  let st=null;
+  try{ st = await DB.get('state'); }catch(e){ saveOK=false; }
+  if (st){
+    FIELDS.forEach(k=>{ if(st.info && st.info[k]) $(k).value=st.info[k]; });
+    $('memo').value = st.memo || '';
+    for (const id of (st.order||[])){
+      try{ const data = await DB.get('img:'+id); if (data) photos.push(makePhoto(id, new Uint8Array(data), (st.desc||{})[id])); }catch(e){}
+    }
+  }
+  if(!$('surveyor').value){ try{ $('surveyor').value = localStorage.getItem('hirose-chosa-surveyor')||''; }catch(e){} }
+  if(!$('date').value) $('date').value = today();
+  render(); memoMeter(); resetRow(false);
+  if (st && (photos.length || st.memo || (st.info && (st.info.customer||st.info.building)))) setStatus('前回の続きから再開しました（写真'+photos.length+'枚）。','ok');
+  if(!saveOK) markSaved();
+})();
+
+// ── Excel作成と送信 ──
+function b64ToBytes(b64){ const bin=atob(b64); const u=new Uint8Array(bin.length); for(let i=0;i<bin.length;i++) u[i]=bin.charCodeAt(i); return u; }
+function fileName(){
+  const n = ($('building').value.trim() || $('customer').value.trim() || '物件').replace(/[\\/:*?"<>|]/g,'').slice(0,40);
+  const d = ($('date').value || today()).replace(/-/g,'');
+  return d+'_現場調査報告書_'+n+'.xlsx';
+}
+let claudeDownloads;
+if (window.claude && window.claude.use) window.claude.use('downloads').then(d=>{ claudeDownloads=d; }).catch(()=>{ claudeDownloads=null; });
+
+$('go').addEventListener('click', async ()=>{
+  if(!$('building').value.trim() && !$('customer').value.trim()){ setStatus('物件名（またはお客様名）を入力してください。','err'); $('building').focus(); return; }
+  if(!photos.length && !$('memo').value.trim()){ setStatus('写真か現場メモを入れてください。','err'); return; }
+  const go=$('go'); go.disabled=true; setStatus('Excelを作成中…');
+  try{
+    const info = Object.fromEntries(FIELDS.map(k=>[k,$(k).value]));
+    const bytes = await buildReport(JSZip, b64ToBytes(TEMPLATE_B64), info, photos.map(p=>({data:p.data, desc:p.desc})), $('memo').value);
+    const fname = fileName();
+    const blob = new Blob([bytes], {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+    const file = new File([blob], fname, {type: blob.type});
+    if (claudeDownloads){
+      try{ await claudeDownloads.save({filename:fname, data:blob}); setStatus('「'+fname+'」を作成しました。','ok'); }
+      catch(e){ setStatus(e && e.code==='declined' ? '保存をキャンセルしました。もう一度押すと作り直せます。' : '保存できませんでした（'+(e&&e.code||'エラー')+'）。','err'); }
+    } else if (navigator.canShare && navigator.canShare({files:[file]})){
+      try{ await navigator.share({files:[file], title:fname}); setStatus('送信画面を開きました。LINE WORKSを選んで送ってください。','ok'); }
+      catch(e){ setStatus(e && e.name==='AbortError' ? '共有をキャンセルしました。入力は残っています。' : '共有できませんでした。','err'); }
+    } else {
+      const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=fname; document.body.appendChild(a); a.click(); a.remove();
+      setStatus('「'+fname+'」を保存しました。LINE WORKSのトークで添付してください。','ok');
+    }
+  }catch(err){ setStatus('作成に失敗しました：'+err.message,'err'); }
+  go.disabled=false;
+});
+</script>
+<script>
+if('serviceWorker' in navigator){ window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{})); }
+</script>
+</body>
+</html>
